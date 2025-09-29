@@ -1,13 +1,13 @@
 [build]
   command = "npm install"
-  publish = "public"  # QUAN TRỌNG: Đổi từ "." thành "public"
+  publish = "public"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/server/api/:splat"
+  status = 200
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/server/:splat"
   status = 200
