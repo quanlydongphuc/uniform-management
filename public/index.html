@@ -914,7 +914,16 @@
     <script>
     // === PHẦN JAVASCRIPT VỚI BACKEND ===
     // Sửa phần khai báo API_BASE thành:
-    const API_BASE = '/.netlify/functions/server';
+    // Sửa API_BASE thành:
+const API_BASE = window.location.origin + '/.netlify/functions/server';
+
+// Hoặc debug để tìm URL đúng:
+const API_BASE = (function() {
+    // Test different endpoints
+    const base = window.location.origin + '/.netlify/functions/server';
+    console.log('API Base URL:', base);
+    return base;
+})();
     
     console.log('🌐 API Base URL:', API_BASE);
     console.log('🌐 Current origin:', window.location.origin);
