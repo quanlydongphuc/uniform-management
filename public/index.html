@@ -934,32 +934,37 @@ const API_BASE = window.location.hostname === 'localhost'
 
     // Lấy dữ liệu từ server
     async function loadDataFromServer() {
-        try {
-            showNotification('Đang tải dữ liệu...', 'info');
-            const response = await fetch(`${API_BASE}/data`);
-            const data = await response.json();
-            
-            products = data.products || [];
-            salesHistory = data.salesHistory || [];
-            importHistory = data.importHistory || [];
-            priceHistory = data.priceHistory || [];
-            
-            // Nếu chưa có dữ liệu, khởi tạo dữ liệu mẫu
-            if (products.length === 0) {
-                await initSampleData();
-                await loadDataFromServer(); // Load lại sau khi khởi tạo
-                return;
-            }
-            
-            updateDashboardTotals();
-            updateOverview();
-            showMenu('tong-quan');
-            showNotification('Tải dữ liệu thành công', 'success');
-        } catch (error) {
-            console.error('Lỗi khi tải dữ liệu:', error);
-            showNotification('Không thể kết nối đến server. Kiểm tra kết nối internet và server.', 'error');
+    try {
+        console.log('Loading data from:', API_BASE + '/data');
+        const response = await fetch(API_BASE + '/data');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        const data = await response.json();
+        console.log('Data loaded successfully:', data);
+        
+        products = data.products || [];
+        salesHistory = data.salesHistory || [];
+        importHistory = data.importHistory || [];
+        priceHistory = data.priceHistory || [];
+        
+        if (products.length === 0) {
+            await initSampleData();
+            await loadDataFromServer();
+            return;
+        }
+        
+        updateDashboardTotals();
+        updateOverview();
+        showMenu('tong-quan');
+        showNotification('Tải dữ liệu thành công', 'success');
+    } catch (error) {
+        console.error('Lỗi khi tải dữ liệu:', error);
+        showNotification('Lỗi kết nối: ' + error.message, 'error');
     }
+}
 
     // Khởi tạo dữ liệu mẫu
     async function initSampleData() {
