@@ -737,14 +737,14 @@
         <div class="nav-container">
             <h1 class="app-title">HỆ THỐNG QUẢN LÝ BÁN ĐỒNG PHỤC</h1>
             <nav class="main-nav">
-                <button class="nav-btn active" onclick="showMenu('tong-quan')">Tổng Quan</button>
-                <button class="nav-btn" onclick="showMenu('gia-ban')">Giá Bán</button>
-                <button class="nav-btn" onclick="showMenu('nhap-hang')">Nhập Hàng</button>
-                <button class="nav-btn" onclick="showMenu('ban-hang')">Bán Hàng</button>
-                <button class="nav-btn" onclick="showMenu('ton-kho')">Tồn Kho</button>
-                <button class="nav-btn" onclick="showMenu('lich-su-nhap')">Lịch Sử Nhập</button>
-                <button class="nav-btn" onclick="showMenu('lich-su-ban')">Lịch Sử Bán</button>
-            </nav>
+    <button class="nav-btn active" onclick="showMenu('tong-quan', event)">Tổng Quan</button>
+    <button class="nav-btn" onclick="showMenu('gia-ban', event)">Giá Bán</button>
+    <button class="nav-btn" onclick="showMenu('nhap-hang', event)">Nhập Hàng</button>
+    <button class="nav-btn" onclick="showMenu('ban-hang', event)">Bán Hàng</button>
+    <button class="nav-btn" onclick="showMenu('ton-kho', event)">Tồn Kho</button>
+    <button class="nav-btn" onclick="showMenu('lich-su-nhap', event)">Lịch Sử Nhập</button>
+    <button class="nav-btn" onclick="showMenu('lich-su-ban', event)">Lịch Sử Bán</button>
+</nav>
         </div>
     </header>
 
@@ -937,10 +937,13 @@ const API_BASE = (function() {
     let currentProduct = null;
 
     // Khởi tạo ứng dụng
-    document.addEventListener('DOMContentLoaded', function() {
-        loadDataFromServer();
-        initMobileFeatures();
-    });
+    // Khởi tạo ứng dụng
+document.addEventListener('DOMContentLoaded', function() {
+    loadDataFromServer();
+    initMobileFeatures();
+    // Đảm bảo menu Tổng quan được active
+    showMenu('tong-quan');
+});
 
     // Lấy dữ liệu từ server
     // Lấy dữ liệu từ server - ĐÃ SỬA LỖI
@@ -1061,52 +1064,64 @@ async function initSampleData() {
     // === CÁC HÀM CHỨC NĂNG CHÍNH ===
 
     // Hiển thị menu
-    function showMenu(menuId) {
-        // Ẩn tất cả menu
-        document.querySelectorAll('.menu-section').forEach(section => {
-            section.classList.remove('active');
-        });
-        
-        // Xóa active tất cả nút
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        
-        // Hiển thị menu được chọn
-        document.getElementById(menuId).classList.add('active');
-        
-        // Active nút được chọn
+    // Hiển thị menu - ĐÃ SỬA LỖI EVENT
+function showMenu(menuId, event) {
+    // Ẩn tất cả menu
+    console.log('🔄 Switching to menu:', menuId, 'Event:', event);
+    document.querySelectorAll('.menu-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    // Xóa active tất cả nút
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Hiển thị menu được chọn
+    document.getElementById(menuId).classList.add('active');
+    
+    // Active nút được chọn (nếu có event)
+    if (event && event.target) {
         event.target.classList.add('active');
-        
-        // Load dữ liệu cho menu
-        switch(menuId) {
-            case 'tong-quan':
-                updateOverview();
-                break;
-            case 'gia-ban':
-                initPriceManagement();
-                break;
-            case 'nhap-hang':
-                initImportForm();
-                break;
-            case 'ban-hang':
-                initProductsGrid();
-                break;
-            case 'ton-kho':
-                initInventoryTable();
-                break;
-            case 'lich-su-nhap':
-                setTimeout(() => {
-                    initImportHistory();
-                }, 50);
-                break;
-            case 'lich-su-ban':
-                setTimeout(() => {
-                    initSalesHistory();
-                }, 50);
-                break;
-        }
+    } else {
+        // Nếu không có event, tìm nút tương ứng với menuId
+        const navButtons = document.querySelectorAll('.nav-btn');
+        navButtons.forEach(btn => {
+            if (btn.onclick && btn.onclick.toString().includes(menuId)) {
+                btn.classList.add('active');
+            }
+        });
     }
+    
+    // Load dữ liệu cho menu
+    switch(menuId) {
+        case 'tong-quan':
+            updateOverview();
+            break;
+        case 'gia-ban':
+            initPriceManagement();
+            break;
+        case 'nhap-hang':
+            initImportForm();
+            break;
+        case 'ban-hang':
+            initProductsGrid();
+            break;
+        case 'ton-kho':
+            initInventoryTable();
+            break;
+        case 'lich-su-nhap':
+            setTimeout(() => {
+                initImportHistory();
+            }, 50);
+            break;
+        case 'lich-su-ban':
+            setTimeout(() => {
+                initSalesHistory();
+            }, 50);
+            break;
+    }
+}
 
     // === MENU TỔNG QUAN ===
     function updateOverview() {
