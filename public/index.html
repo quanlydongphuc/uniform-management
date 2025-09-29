@@ -931,47 +931,96 @@
     });
 
     // Lấy dữ liệu từ server
-    async function loadDataFromServer() {
+    // Lấy dữ liệu từ server - ĐÃ SỬA LỖI
+async function loadDataFromServer() {
     try {
-        console.log('Loading data from:', API_BASE + '/data');
-        const response = await fetch(API_BASE + '/data');
+        // Sử dụng API_BASE đúng
+        const apiUrl = API_BASE + '/api/data';
+        console.log('🔄 Đang tải dữ liệu từ:', apiUrl);
         
+        showNotification('Đang tải dữ liệu...', 'info');
+        
+        const response = await fetch(apiUrl);
+        console.log('📊 Response status:', response.status);
+        console.log('📊 Response ok:', response.ok);
+        
+        // Kiểm tra nếu response không thành công
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorText = await response.text();
+            console.error('❌ HTTP error:', response.status, errorText);
+            throw new Error(`Lỗi server: ${response.status} - ${response.statusText}`);
         }
         
+        // Parse dữ liệu JSON
         const data = await response.json();
-        console.log('Data loaded successfully:', data);
+        console.log('✅ Dữ liệu nhận được:', data);
         
         products = data.products || [];
         salesHistory = data.salesHistory || [];
         importHistory = data.importHistory || [];
         priceHistory = data.priceHistory || [];
         
+        console.log(`📦 Loaded: ${products.length} sản phẩm, ${salesHistory.length} lịch sử bán, ${importHistory.length} lịch sử nhập`);
+        
+        // Nếu chưa có dữ liệu, khởi tạo dữ liệu mẫu
         if (products.length === 0) {
+            console.log('🆕 Khởi tạo dữ liệu mẫu...');
             await initSampleData();
-            await loadDataFromServer();
+            await loadDataFromServer(); // Load lại sau khi khởi tạo
             return;
         }
         
         updateDashboardTotals();
         updateOverview();
         showMenu('tong-quan');
-        showNotification('Tải dữ liệu thành công', 'success');
+        showNotification('Tải dữ liệu thành công!', 'success');
+        
     } catch (error) {
-        console.error('Lỗi khi tải dữ liệu:', error);
-        showNotification('Lỗi kết nối: ' + error.message, 'error');
+        console.error('❌ Lỗi khi tải dữ liệu:', error);
+        
+        // Hiển thị thông báo lỗi chi tiết
+        let errorMessage = 'Không thể kết nối đến server';
+        if (error.message.includes('Failed to fetch')) {
+            errorMessage = 'Không thể kết nối đến server. Kiểm tra kết nối internet.';
+        } else if (error.message.includes('Unexpected token')) {
+            errorMessage = 'Lỗi định dạng dữ liệu từ server.';
+        } else if (error.message.includes('404')) {
+            errorMessage = 'Không tìm thấy API endpoint. Kiểm tra cấu hình server.';
+        }
+        
+        showNotification(errorMessage + ' ' + error.message, 'error');
+        
+        // Thử load lại sau 5 giây
+        setTimeout(() => {
+            console.log('🔄 Thử kết nối lại...');
+            loadDataFromServer();
+        }, 5000);
     }
 }
 
     // Khởi tạo dữ liệu mẫu
-    async function initSampleData() {
-        try {
-            await fetch(`${API_BASE}/init`, { method: 'POST' });
-        } catch (error) {
-            console.error('Lỗi khi khởi tạo dữ liệu:', error);
+async function initSampleData() {
+    try {
+        console.log('🆕 Đang khởi tạo dữ liệu mẫu...');
+        const response = await fetch(API_BASE + '/api/init', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Lỗi khởi tạo: ${response.status}`);
         }
+        
+        const result = await response.json();
+        console.log('✅ Khởi tạo dữ liệu mẫu thành công:', result);
+        return result;
+    } catch (error) {
+        console.error('❌ Lỗi khi khởi tạo dữ liệu:', error);
+        throw error;
     }
+}
 
     // Lưu dữ liệu lên server
     async function saveDataToServer() {
