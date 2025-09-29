@@ -1,3 +1,7 @@
+// THÊM DÒNG NÀY Ở ĐẦU FILE
+console.log('Function started - Environment:', process.env.NODE_ENV);
+console.log('MongoDB URI:', process.env.MONGODB_URI ? 'Set' : 'Not set');
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
