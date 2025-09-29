@@ -1,18 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const path = require('path');
-require('dotenv').config();
+const serverless = require('serverless-http');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-
-// Serve static files from React app
-app.use(express.static(path.join(__dirname, '..', '..', 'public')));
 
 // Kết nối MongoDB Atlas
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -77,8 +72,6 @@ const ImportHistory = mongoose.model('ImportHistory', importHistorySchema);
 const PriceHistory = mongoose.model('PriceHistory', priceHistorySchema);
 
 // API Routes
-
-// Lấy tất cả dữ liệu
 app.get('/api/data', async (req, res) => {
   try {
     const products = await Product.find();
@@ -97,12 +90,10 @@ app.get('/api/data', async (req, res) => {
   }
 });
 
-// Lưu tất cả dữ liệu
 app.post('/api/save', async (req, res) => {
   try {
     const { products, salesHistory, importHistory, priceHistory } = req.body;
     
-    // Xóa dữ liệu cũ và lưu mới
     await Product.deleteMany({});
     await Product.insertMany(products);
     
@@ -127,14 +118,33 @@ app.post('/api/save', async (req, res) => {
   }
 });
 
-// Khởi tạo dữ liệu mẫu
 app.post('/api/init', async (req, res) => {
   try {
     const sampleProducts = [
-      // Đồng phục Nam
       { id: 1, type: 'nam', size: 2, name: 'ĐP Nam 2', price: 110000, stock: 0, imported: 0, sold: 0 },
       { id: 2, type: 'nam', size: 3, name: 'ĐP Nam 3', price: 110000, stock: 0, imported: 0, sold: 0 },
-      // ... (thêm tất cả sản phẩm như trong frontend)
+      { id: 3, type: 'nam', size: 4, name: 'ĐP Nam 4', price: 110000, stock: 0, imported: 0, sold: 0 },
+      { id: 4, type: 'nam', size: 5, name: 'ĐP Nam 5', price: 110000, stock: 0, imported: 0, sold: 0 },
+      { id: 5, type: 'nam', size: 6, name: 'ĐP Nam 6', price: 115000, stock: 0, imported: 0, sold: 0 },
+      { id: 6, type: 'nam', size: 7, name: 'ĐP Nam 7', price: 120000, stock: 0, imported: 0, sold: 0 },
+      { id: 7, type: 'nam', size: 8, name: 'ĐP Nam 8', price: 120000, stock: 0, imported: 0, sold: 0 },
+      { id: 8, type: 'nam', size: 10, name: 'ĐP Nam 10', price: 120000, stock: 0, imported: 0, sold: 0 },
+      { id: 9, type: 'nu', size: 2, name: 'ĐP Nữ 2', price: 110000, stock: 0, imported: 0, sold: 0 },
+      { id: 10, type: 'nu', size: 3, name: 'ĐP Nữ 3', price: 110000, stock: 0, imported: 0, sold: 0 },
+      { id: 11, type: 'nu', size: 4, name: 'ĐP Nữ 4', price: 110000, stock: 0, imported: 0, sold: 0 },
+      { id: 12, type: 'nu', size: 5, name: 'ĐP Nữ 5', price: 110000, stock: 0, imported: 0, sold: 0 },
+      { id: 13, type: 'nu', size: 6, name: 'ĐP Nữ 6', price: 115000, stock: 0, imported: 0, sold: 0 },
+      { id: 14, type: 'nu', size: 7, name: 'ĐP Nữ 7', price: 120000, stock: 0, imported: 0, sold: 0 },
+      { id: 15, type: 'nu', size: 8, name: 'ĐP Nữ 8', price: 120000, stock: 0, imported: 0, sold: 0 },
+      { id: 16, type: 'nu', size: 10, name: 'ĐP Nữ 10', price: 120000, stock: 0, imported: 0, sold: 0 },
+      { id: 17, type: 'the_duc', size: 2, name: 'Thể dục 2', price: 65000, stock: 0, imported: 0, sold: 0 },
+      { id: 18, type: 'the_duc', size: 3, name: 'Thể dục 3', price: 65000, stock: 0, imported: 0, sold: 0 },
+      { id: 19, type: 'the_duc', size: 4, name: 'Thể dục 4', price: 65000, stock: 0, imported: 0, sold: 0 },
+      { id: 20, type: 'the_duc', size: 5, name: 'Thể dục 5', price: 65000, stock: 0, imported: 0, sold: 0 },
+      { id: 21, type: 'the_duc', size: 6, name: 'Thể dục 6', price: 70000, stock: 0, imported: 0, sold: 0 },
+      { id: 22, type: 'the_duc', size: 7, name: 'Thể dục 7', price: 70000, stock: 0, imported: 0, sold: 0 },
+      { id: 23, type: 'the_duc', size: 8, name: 'Thể dục 8', price: 75000, stock: 0, imported: 0, sold: 0 },
+      { id: 24, type: 'the_duc', size: 10, name: 'Thể dục 10', price: 75000, stock: 0, imported: 0, sold: 0 }
     ];
     
     await Product.deleteMany({});
@@ -146,22 +156,5 @@ app.post('/api/init', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server đang chạy trên port ${PORT}`);
-});
-
-// Serve React app for all other routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', '..', 'public', 'index.html'));
-});
-
 // Netlify Functions handler
-const handler = require('serverless-http')(app);
-
-module.exports.handler = async (event, context) => {
-  return await handler(event, context);
-};
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+module.exports.handler = serverless(app);
