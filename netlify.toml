@@ -1,6 +1,6 @@
 [build]
   command = "npm install"
-  publish = "."
+  publish = "public"  # QUAN TRỌNG: Đổi từ "." thành "public"
 
 [[redirects]]
   from = "/*"
