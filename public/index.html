@@ -914,12 +914,10 @@
     <script>
     // === PHẦN JAVASCRIPT VỚI BACKEND ===
     // Sửa phần khai báo API_BASE thành:
-const API_BASE = window.location.origin + '/.netlify/functions/server';
-// Hoặc thử cái này nếu trên không work:
-// const API_BASE = '/.netlify/functions/server';
-
-console.log('🌐 API Base URL:', API_BASE);
-console.log('🌐 Current origin:', window.location.origin);
+    const API_BASE = '/.netlify/functions/server';
+    
+    console.log('🌐 API Base URL:', API_BASE);
+    console.log('🌐 Current origin:', window.location.origin);
 
     // Dữ liệu ứng dụng
     let products = [];
